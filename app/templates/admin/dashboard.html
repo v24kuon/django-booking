@@ -1,0 +1,274 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>管理ダッシュボード</h2>
+
+<section class="card" style="margin-bottom: 1rem;">
+  <h3>検索</h3>
+  <form method="get" action="/admin">
+    <div class="grid">
+      <label>
+        種別
+        <select name="search_type">
+          <option value="">選択</option>
+          <option value="user" {% if search_type == "user" %}selected{% endif %}>ユーザー</option>
+          <option value="event" {% if search_type == "event" %}selected{% endif %}>イベント</option>
+          <option value="application" {% if search_type == "application" %}selected{% endif %}>応募</option>
+          <option value="review" {% if search_type == "review" %}selected{% endif %}>レビュー</option>
+        </select>
+      </label>
+      <label>
+        検索語
+        <input type="text" name="q" value="{{ search_query }}" />
+      </label>
+    </div>
+    <button type="submit">検索</button>
+  </form>
+  {% if search_results %}
+    <table style="margin-top: 1rem;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>情報</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for result in search_results %}
+          <tr>
+            <td>{{ result.id }}</td>
+            <td>
+              {% if search_type == "user" %}
+                {{ result.email }} ({{ result.role }})
+              {% elif search_type == "event" %}
+                {{ result.title }}
+              {% elif search_type == "application" %}
+                イベント: {{ result.event_id }} / 出店者: {{ result.stallholder_id }}
+              {% elif search_type == "review" %}
+                スコア: {{ result.score }} / {{ result.comment[:50] }}
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h3>審査待ちイベント</h3>
+  {% if pending_events %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>タイトル</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in pending_events %}
+          <tr>
+            <td>{{ event.id }}</td>
+            <td>{{ event.title }}</td>
+            <td>
+              <form method="post" action="/admin/events/{{ event.id }}/approve" style="display:inline;">
+                <button type="submit">承認</button>
+              </form>
+              <form method="post" action="/admin/events/{{ event.id }}/reject" style="display:inline;">
+                <button type="submit" class="secondary">否認</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>審査待ちはありません。</p>
+  {% endif %}
+</section>
+
+<section class="card" style="margin-top: 1rem;">
+  <h3>出店者プロフィール審査</h3>
+  {% if pending_profiles %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>ユーザーID</th>
+          <th>屋号</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for profile in pending_profiles %}
+          <tr>
+            <td>{{ profile.id }}</td>
+            <td>{{ profile.user_id }}</td>
+            <td>{{ profile.business_name }}</td>
+            <td>
+              <form method="post" action="/admin/profiles/{{ profile.id }}/approve" style="display:inline;">
+                <input type="text" name="note" placeholder="メモ" />
+                <button type="submit">承認</button>
+              </form>
+              <form method="post" action="/admin/profiles/{{ profile.id }}/reject" style="display:inline;">
+                <input type="text" name="note" placeholder="メモ" />
+                <button type="submit" class="secondary">否認</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>審査待ちはありません。</p>
+  {% endif %}
+</section>
+
+<section class="card" style="margin-top: 1rem;">
+  <h3>通報一覧</h3>
+  {% if reports %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>対象</th>
+          <th>ステータス</th>
+          <th>対応</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in reports %}
+          <tr>
+            <td>{{ report.id }}</td>
+            <td>{{ report.target_type }} / {{ report.target_id }}</td>
+            <td>{{ report_status_labels.get(report.status, report.status) }}</td>
+            <td>
+              <form method="post" action="/admin/reports/{{ report.id }}/status">
+                <select name="status">
+                  <option value="open" {% if report.status == "open" %}selected{% endif %}>対応中</option>
+                  <option value="closed" {% if report.status == "closed" %}selected{% endif %}>対応済み</option>
+                  <option value="resolved" {% if report.status == "resolved" %}selected{% endif %}>解決済み</option>
+                </select>
+                <input type="text" name="resolution_note" placeholder="対応メモ" />
+                <button type="submit">更新</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>通報はありません。</p>
+  {% endif %}
+</section>
+
+<section class="card" style="margin-top: 1rem;">
+  <h3>運営メモ</h3>
+  <form method="post" action="/admin/notes">
+    <label>
+      対象種別
+      <select name="target_type">
+        <option value="user">user</option>
+        <option value="event">event</option>
+      </select>
+    </label>
+    <label>対象ID<input type="number" name="target_id" required /></label>
+    <label>メモ<textarea name="note" required></textarea></label>
+    <button type="submit">保存</button>
+  </form>
+  {% if admin_notes %}
+    <table style="margin-top: 1rem;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>対象</th>
+          <th>メモ</th>
+          <th>作成日</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for note in admin_notes %}
+          <tr>
+            <td>{{ note.id }}</td>
+            <td>{{ note.target_type }} / {{ note.target_id }}</td>
+            <td>{{ note.note }}</td>
+            <td>{{ note.created_at }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</section>
+
+<section class="card" style="margin-top: 1rem;">
+  <h3>ガイド配信</h3>
+  <form method="post" action="/admin/guides">
+    <label>
+      対象
+      <select name="target_role">
+        <option value="stallholder">stallholder</option>
+        <option value="organizer">organizer</option>
+        <option value="all">all</option>
+      </select>
+    </label>
+    <label>タイトル<input type="text" name="title" required /></label>
+    <label>本文<textarea name="body" required></textarea></label>
+    <label>
+      公開する
+      <input type="checkbox" name="publish" value="true" />
+    </label>
+    <button type="submit">作成</button>
+  </form>
+  {% if guides %}
+    <table style="margin-top: 1rem;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>タイトル</th>
+          <th>対象</th>
+          <th>公開</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for guide in guides %}
+          <tr>
+            <td>{{ guide.id }}</td>
+            <td>{{ guide.title }}</td>
+            <td>{{ guide.target_role }}</td>
+            <td>{% if guide.is_published %}公開{% else %}非公開{% endif %}</td>
+            <td>
+              <form method="post" action="/admin/guides/{{ guide.id }}/update" style="display:inline;">
+                <input type="text" name="title" value="{{ guide.title }}" required />
+                <textarea name="body" required>{{ guide.body }}</textarea>
+                <label>
+                  <input type="checkbox" name="publish" value="true" {% if guide.is_published %}checked{% endif %} />
+                  公開
+                </label>
+                <button type="submit">更新</button>
+              </form>
+              <form method="post" action="/admin/guides/{{ guide.id }}/delete" style="display:inline;">
+                <button type="submit" class="secondary">削除</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</section>
+
+<section class="card" style="margin-top: 1rem;">
+  <h3>ユーザー停止/復帰</h3>
+  <form method="post" action="/admin/users/toggle">
+    <label>ユーザーID<input type="number" name="user_id" required /></label>
+    <label>
+      状態
+      <select name="is_active">
+        <option value="true">有効</option>
+        <option value="false">停止</option>
+      </select>
+    </label>
+    <button type="submit">更新</button>
+  </form>
+</section>
+{% endblock %}

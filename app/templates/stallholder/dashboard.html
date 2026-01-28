@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>出店者ダッシュボード</h2>
+<div class="card" style="margin-bottom: 1rem;">
+  <form method="get" action="/stallholder">
+    <div class="grid">
+      <label>
+        地域
+        <select name="region">
+          <option value="">すべて</option>
+          {% for region in regions %}
+          <option value="{{ region }}" {% if selected_region == region %}selected{% endif %}>
+            {{ region }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        ジャンル
+        <select name="genre">
+          <option value="">すべて</option>
+          {% for genre in genres %}
+          <option value="{{ genre }}" {% if selected_genre == genre %}selected{% endif %}>
+            {{ genre }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        日程
+        <input type="date" name="date" value="{{ selected_date }}" />
+      </label>
+    </div>
+    <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+      <button type="submit">検索する</button>
+      <a href="/stallholder" role="button" class="secondary">リセット</a>
+      <a href="/stallholder/profile" role="button" class="secondary">プロフィール</a>
+    </div>
+  </form>
+</div>
+<p>募集中のイベント一覧</p>
+{% if events %}
+  <div class="grid">
+    {% for event in events %}
+      <article class="card">
+        <h3>{{ event.title }}</h3>
+        <p>{{ event.region }} / {{ event.genre }}</p>
+        <span class="badge">{{ event_status_labels.get(event.status, event.status) }}</span>
+        <div style="margin-top: 0.5rem;">
+          <a href="/stallholder/events/{{ event.id }}" role="button">詳細</a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>現在公開中のイベントはありません。</p>
+{% endif %}
+{% endblock %}

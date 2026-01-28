@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="card">
+  <h2>イベント新規作成</h2>
+  {% if error %}
+  <p style="color: #b91c1c;">{{ error }}</p>
+  {% endif %}
+  <form method="post" action="/organizer/events">
+    <label>イベント名<input type="text" name="title" required /></label>
+    <label>説明<textarea name="description" required></textarea></label>
+    <label>地域<input type="text" name="region" required /></label>
+    <label>会場<input type="text" name="venue_address" required /></label>
+    <label>ジャンル<input type="text" name="genre" required /></label>
+    <label>開始日<input type="datetime-local" name="start_date" required /></label>
+    <label>終了日<input type="datetime-local" name="end_date" required /></label>
+    <label>締切<input type="datetime-local" name="application_deadline" required /></label>
+    <label>募集枠<input type="number" name="capacity" min="1" required /></label>
+    <button type="submit">保存する</button>
+  </form>
+</section>
+{% endblock %}

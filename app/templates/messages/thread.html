@@ -1,0 +1,16 @@
+{% if error %}
+<p style="color: #b91c1c;">{{ error }}</p>
+{% endif %}
+{% if messages %}
+  <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+    {% for message in messages %}
+      <div class="card" style="padding: 0.75rem;">
+        <p style="margin: 0;"><strong>#{{ message.sender_id }}</strong></p>
+        <p style="margin: 0.25rem 0 0;">{{ message.content }}</p>
+        <small>{{ message.created_at }}</small>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>まだメッセージがありません。</p>
+{% endif %}

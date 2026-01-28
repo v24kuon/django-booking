@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>応募状況</h2>
+{% if applications %}
+  <table>
+    <thead>
+      <tr>
+        <th>イベントID</th>
+        <th>ステータス</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app in applications %}
+        <tr>
+          <td>{{ app.event_id }}</td>
+          <td>{{ app_status_labels.get(app.status, app.status) }}</td>
+          <td>
+            {% if app.status == "approved" %}
+            <a href="/messages/{{ app.id }}" role="button" class="secondary">メッセージ</a>
+            <a href="/stallholder/reviews/{{ app.id }}/new" role="button" class="secondary">レビュー</a>
+            {% endif %}
+            {% if app.status in ["pending", "approved"] %}
+            <form method="post" action="/stallholder/applications/{{ app.id }}/cancel" style="display:inline;">
+              <button type="submit" class="secondary">キャンセル</button>
+            </form>
+            {% endif %}
+            {% if app.status not in ["approved", "pending"] and app.status != "cancelled" %}
+            -
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>応募履歴がありません。</p>
+{% endif %}
+{% endblock %}

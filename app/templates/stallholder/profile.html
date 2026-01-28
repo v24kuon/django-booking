@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="card">
+  <h2>プロフィール編集</h2>
+  {% if error %}
+  <p style="color: #b91c1c;">{{ error }}</p>
+  {% endif %}
+  <p><strong>審査ステータス:</strong> {{ profile_review_status_labels.get(profile.review_status, profile.review_status) }}</p>
+  {% if profile.review_note %}
+  <p><strong>審査メモ:</strong> {{ profile.review_note }}</p>
+  {% endif %}
+  <form method="post" action="/stallholder/profile">
+    <label>屋号<input type="text" name="business_name" value="{{ profile.business_name }}" required /></label>
+    <label>ジャンル<input type="text" name="genre" value="{{ profile.genre }}" required /></label>
+    <label>自己紹介<textarea name="bio" required>{{ profile.bio }}</textarea></label>
+    <label>サイトURL<input type="url" name="website_url" value="{{ profile.website_url or '' }}" /></label>
+    <label>過去実績<textarea name="past_achievements">{{ profile.past_achievements or '' }}</textarea></label>
+    <button type="submit">更新する</button>
+  </form>
+</section>
+{% endblock %}

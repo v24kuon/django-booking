@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="card">
+  <h2>レビュー投稿</h2>
+  <p><strong>イベント:</strong> {{ event.title }}</p>
+  <p><strong>対象:</strong> {{ target.email }}</p>
+  <form method="post" action="/stallholder/reviews/{{ application.id }}">
+    <label>
+      スコア (1-5)
+      <select name="score" required>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+    </label>
+    <label>
+      コメント
+      <textarea name="comment" required></textarea>
+    </label>
+    <button type="submit">投稿する</button>
+  </form>
+</section>
+{% endblock %}

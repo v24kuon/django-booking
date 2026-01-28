@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>応募者一覧</h2>
+<p><strong>イベント:</strong> {{ event.title }}</p>
+{% if applications %}
+  <table>
+    <thead>
+      <tr>
+        <th>応募ID</th>
+        <th>出店者ID</th>
+        <th>応募メモ</th>
+        <th>ステータス</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app in applications %}
+        <tr>
+          <td>{{ app.id }}</td>
+          <td>{{ app.stallholder_id }}</td>
+          <td>{{ app.memo or "-" }}</td>
+          <td>{{ app_status_labels.get(app.status, app.status) }}</td>
+          <td>
+            {% if app.status == "pending" %}
+            <form method="post" action="/organizer/applications/{{ app.id }}/approve" style="display:inline;">
+              <button type="submit">承認</button>
+            </form>
+            <form method="post" action="/organizer/applications/{{ app.id }}/reject" style="display:inline;">
+              <button type="submit" class="secondary">否認</button>
+            </form>
+            {% elif app.status == "approved" %}
+            <a href="/messages/{{ app.id }}" role="button" class="secondary">メッセージ</a>
+            <a href="/organizer/reviews/{{ app.id }}/new" role="button" class="secondary">レビュー</a>
+            {% else %}
+            <span style="color: #6b7280;">操作不可</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>応募がありません。</p>
+{% endif %}
+{% endblock %}

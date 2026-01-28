@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+<article class="card">
+  <h2>{{ event.title }}</h2>
+  <p>{{ event.description }}</p>
+  <p><strong>地域:</strong> {{ event.region }}</p>
+  <p><strong>ジャンル:</strong> {{ event.genre }}</p>
+  <p><strong>会場:</strong> {{ event.venue_address }}</p>
+  <p><strong>状態:</strong> {{ event_status_labels.get(event.status, event.status) }}</p>
+  
+  {% if error_message %}
+    <div class="error" style="margin: 1rem 0; padding: 1rem; background: rgba(220, 38, 38, 0.1); border: 1px solid rgba(220, 38, 38, 0.3); border-radius: 12px; color: #dc2626;">
+      {{ error_message }}
+    </div>
+  {% endif %}
+  
+  {% if existing_application %}
+    <div style="margin: 1rem 0; padding: 1rem; background: rgba(63, 98, 18, 0.1); border: 1px solid rgba(63, 98, 18, 0.3); border-radius: 12px; color: var(--olive);">
+      <p><strong>応募済み</strong></p>
+      <p>応募ステータス: {{ app_status_labels.get(existing_application.status, existing_application.status) }}</p>
+      <a href="/stallholder/applications" class="btn-primary" style="margin-top: 0.5rem; display: inline-block;">応募状況を確認</a>
+    </div>
+  {% elif event.status == "open" %}
+    <form method="post" action="/stallholder/events/{{ event.id }}/apply" style="margin-top: 1rem;">
+      <button type="submit" class="btn-primary">応募する</button>
+    </form>
+  {% else %}
+    <div style="margin: 1rem 0; padding: 1rem; background: rgba(107, 114, 128, 0.1); border: 1px solid rgba(107, 114, 128, 0.3); border-radius: 12px; color: #6b7280;">
+      <p>このイベントは現在応募を受け付けていません。</p>
+    </div>
+  {% endif %}
+</article>
+{% endblock %}

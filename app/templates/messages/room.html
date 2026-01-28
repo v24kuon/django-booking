@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<section class="card">
+  <h2>メッセージ</h2>
+  <p><strong>イベント:</strong> {{ event.title }}</p>
+  <div id="message-thread">
+    {% include "messages/thread.html" %}
+  </div>
+  <form
+    method="post"
+    action="/messages/{{ application.id }}"
+    hx-post="/messages/{{ application.id }}"
+    hx-target="#message-thread"
+    hx-swap="innerHTML"
+    style="margin-top: 1rem;"
+  >
+    <label>
+      メッセージ
+      <textarea name="content" required></textarea>
+    </label>
+    <button type="submit">送信</button>
+  </form>
+</section>
+{% endblock %}

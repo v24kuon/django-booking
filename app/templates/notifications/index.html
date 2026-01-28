@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>通知一覧</h2>
+{% if notifications %}
+  <table>
+    <thead>
+      <tr>
+        <th>タイトル</th>
+        <th>内容</th>
+        <th>状態</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for notification in notifications %}
+        <tr>
+          <td>{{ notification.title }}</td>
+          <td>{{ notification.body }}</td>
+          <td>{% if notification.is_read %}既読{% else %}未読{% endif %}</td>
+          <td>
+            {% if not notification.is_read %}
+            <form method="post" action="/notifications/{{ notification.id }}/read">
+              <button type="submit">既読にする</button>
+            </form>
+            {% else %}
+            -
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>通知はありません。</p>
+{% endif %}
+{% endblock %}

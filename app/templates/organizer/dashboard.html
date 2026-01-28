@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>主催者ダッシュボード</h2>
+<div class="card" style="margin-bottom: 1rem;">
+  <div class="grid">
+    <div>
+      <small>総イベント数</small>
+      <h3 style="margin: 0;">{{ events|length }}</h3>
+    </div>
+    <div>
+      <small>下書き</small>
+      <h3 style="margin: 0;">{{ status_counts.get("draft", 0) }}</h3>
+    </div>
+    <div>
+      <small>審査中</small>
+      <h3 style="margin: 0;">{{ status_counts.get("pending_review", 0) }}</h3>
+    </div>
+    <div>
+      <small>公開中</small>
+      <h3 style="margin: 0;">{{ status_counts.get("open", 0) }}</h3>
+    </div>
+  </div>
+</div>
+<a href="/organizer/events/new" role="button">イベントを作成</a>
+{% if events %}
+  <div class="grid">
+    {% for event in events %}
+      <article class="card">
+        <h3>{{ event.title }}</h3>
+        <p>{{ event.region }} / {{ event.genre }}</p>
+        <span class="badge">{{ event_status_labels.get(event.status, event.status) }}</span>
+        <p style="margin-top: 0.5rem;">応募数: {{ application_counts.get(event.id, 0) }}</p>
+        <div style="margin-top: 0.5rem;">
+          <a href="/organizer/events/{{ event.id }}" role="button">詳細</a>
+          <a href="/organizer/events/{{ event.id }}/applications" role="button" class="secondary">応募者一覧</a>
+          {% if event.status == "draft" %}
+          <a href="/organizer/events/{{ event.id }}/edit" role="button" class="secondary">編集</a>
+          {% endif %}
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>まだイベントがありません。</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+<article class="card">
+  <h2>{{ event.title }}</h2>
+  <p>{{ event.description }}</p>
+  <p><strong>地域:</strong> {{ event.region }}</p>
+  <p><strong>ジャンル:</strong> {{ event.genre }}</p>
+  <p><strong>会場:</strong> {{ event.venue_address }}</p>
+  <p><strong>開催期間:</strong> {{ event.start_date }} - {{ event.end_date }}</p>
+  <p><strong>募集締切:</strong> {{ event.application_deadline }}</p>
+  <p><strong>募集枠:</strong> {{ event.capacity }}</p>
+  <p><strong>状態:</strong> {{ event_status_labels.get(event.status, event.status) }}</p>
+  <div style="margin-top: 0.75rem;">
+    <a href="/organizer/events/{{ event.id }}/applications" role="button" class="secondary">応募者一覧</a>
+    {% if event.status == "draft" %}
+    <a href="/organizer/events/{{ event.id }}/edit" role="button" class="secondary">編集</a>
+    <form method="post" action="/organizer/events/{{ event.id }}/submit" style="display:inline;">
+      <button type="submit">審査に提出</button>
+    </form>
+    {% elif event.status == "pending_review" %}
+    <span class="badge">審査中</span>
+    {% endif %}
+  </div>
+</article>
+{% endblock %}
