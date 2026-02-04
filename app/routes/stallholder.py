@@ -87,14 +87,14 @@ def event_detail(
     event = session.get(Event, event_id)
     if not event:
         return RedirectResponse(url="/stallholder", status_code=303)
-    
+
     # 既に応募済みかどうかを確認
     from app.repositories.application_repo import find_application
     existing_application = find_application(session, event.id, user.id)
-    
+
     # エラーメッセージを取得（セッションから）
     error_message = request.session.pop("error_message", None)
-    
+
     return templates.TemplateResponse(
         "stallholder/event_detail.html",
         {
@@ -117,7 +117,7 @@ def apply_event(
     event = session.get(Event, event_id)
     if not event:
         return RedirectResponse(url="/stallholder", status_code=303)
-    
+
     try:
         apply_to_event(session, event, user, memo=None)
         # 成功時はエラーメッセージをクリア

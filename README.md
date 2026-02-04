@@ -31,6 +31,22 @@ export SESSION_SECRET="change-me"
 uv run uvicorn app.main:app --reload
 ```
 
+## Vercel デプロイ（CLI不要）
+
+1. GitHub にリポジトリをプッシュ
+2. Vercel ダッシュボードで「Add New…」→「Project」
+3. GitHub 連携から対象リポジトリを選択
+4. 「Framework Preset」は **Other** を選択
+5. 環境変数を設定
+   - `SESSION_SECRET`: ランダムな長い文字列
+   - `DATABASE_URL`（任意）: 永続化したい場合は外部DBを指定
+6. Deploy
+
+### 注意点
+- Vercel ではローカルファイル書き込みが永続化されません。
+- 何も設定しない場合、DB は `/tmp/app.db` に作成されます（再デプロイで消えます）。
+- 永続化が必要な場合は、PostgreSQL などの外部DBに切り替えて `DATABASE_URL` を設定してください。
+
 ## 管理者アカウントの作成
 
 初回起動時に管理者アカウントを作成する場合:
