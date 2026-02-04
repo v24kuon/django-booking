@@ -10,7 +10,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.staticfiles import StaticFiles
 
 from app.db import init_db
-from app.routes import admin, auth, organizer, stallholder
+from app.routes import admin, auth, organizer, stallholder, setup
 from app.routes import messages
 from app.routes import notifications
 
@@ -65,6 +65,7 @@ def create_app() -> FastAPI:
     app.include_router(stallholder.router, prefix="/stallholder")
     app.include_router(organizer.router, prefix="/organizer")
     app.include_router(admin.router, prefix="/admin")
+    app.include_router(setup.router)
     app.include_router(messages.router)
     app.include_router(notifications.router)
 
